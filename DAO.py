@@ -11,10 +11,10 @@ with open('conf_DB.json') as f:
 
 class connection_mysql:
     def __init__(self):
-        self.conn = pymysql.connect(host='localhost', user=config["SQL_ID"], passwd=config["SQL_PASSWORD"],
+        self.conn = pymysql.connect(host='121.142.73.96', user=config["SQL_ID"], passwd=config["SQL_PASSWORD"],
                                     db=config["DB"])
         self.query_1 = '''
-            CREATE TABLE IF NOT EXISTS main_news(
+            CREATE TABLE IF NOT EXISTS main_news_mirror(
             id VARCHAR(255) PRIMARY KEY,
             title LONGTEXT NOT NULL,
             author VARCHAR(255),
@@ -23,9 +23,9 @@ class connection_mysql:
             content LONGTEXT
             )
             '''
-        self.query_2 = "INSERT INTO main_news(id, title, author, date, page, content) VALUES(%s,%s,%s,%s,%s,%s)"
-        self.query_3 = "DELETE FROM main_news WHERE id=%s"
-        self.query_4 = "SELECT COUNT(*) FROM main_news"
+        self.query_2 = "INSERT INTO main_news_mirror(id, title, author, date, page, content) VALUES(%s,%s,%s,%s,%s,%s)"
+        self.query_3 = "DELETE FROM main_news_mirror WHERE id=%s"
+        self.query_4 = "SELECT COUNT(*) FROM main_news_mirror"
 
 
 # class connection_sqlite:
