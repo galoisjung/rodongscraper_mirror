@@ -25,6 +25,7 @@ class Scraper:
         self.scraped_ids = set([])
         self.news_queue = Queue()
         self.temp_result = list()
+        self.number_of_news = 0
         self.page = num
 
     def initial_function(self):
@@ -39,20 +40,21 @@ class Scraper:
         dom = bs4.BeautifulSoup(resp.content, "lxml")
         news_list = dom.select(".article-desc")
         resp.close()
+        self.number_of_news = len(news_list)
         for i in news_list:
             self.news_queue.put(i)
 
     def run_scraper(self):
-        while len(self.temp_result)<10:
+        while len(self.temp_result) != self.number_of_news:
             try:
                 news_inst = news.news()
                 news_chunk = self.news_queue.get(timeout=3)
-                news_inst.title = news_chunk.select("a")[0].text
-                news_inst.id = hashlib.sha256(news_inst.title.encode('utf-8')).hexdigest()
+                full_content_url = news_chunk.select("a")[0]['href']
+                news_inst.id = hashlib.sha256(full_content_url.encode('utf-8')).hexdigest()
 
                 if news_inst.id not in self.scraped_ids:
+                    news_inst.title = news_chunk.select("a")[0].text
                     self.site_scraper(news_chunk, news_inst)
-                    full_content_url = news_chunk.select("a")[0]['href']
                     print("Scraping URL {}".format(full_content_url))
                     self.scraped_ids.add(news_inst.id)
 
