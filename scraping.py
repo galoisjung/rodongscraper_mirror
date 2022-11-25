@@ -49,11 +49,13 @@ class Scraper:
             try:
                 news_inst = news.news()
                 news_chunk = self.news_queue.get(timeout=3)
-                full_content_url = news_chunk.select("a")[0]['href']
-                news_inst.id = hashlib.sha256(full_content_url.encode('utf-8')).hexdigest()
+                news_inst.title = news_chunk.select("a")[0].text
+                content = news_chunk.select("p .d-none d-sm-none d-md-block").text
+                id_raw = news_inst.title + content.split()[0]
+                news_inst.id = hashlib.sha256(id_raw.encode('utf-8')).hexdigest()
 
                 if news_inst.id not in self.scraped_ids:
-                    news_inst.title = news_chunk.select("a")[0].text
+                    full_content_url = news_chunk.select("a")[0]['href']
                     self.site_scraper(news_chunk, news_inst)
                     print("Scraping URL {}".format(full_content_url))
                     self.scraped_ids.add(news_inst.id)
