@@ -14,7 +14,7 @@ class connection_mysql:
         self.conn = pymysql.connect(host='localhost', user=config["SQL_ID"], passwd=config["SQL_PASSWORD"],
                                     db=config["DB"])
         self.query_1 = '''
-            CREATE TABLE IF NOT EXISTS main_news_mirror_test(
+            CREATE TABLE IF NOT EXISTS main_news_mirror_fix(
             id VARCHAR(255) PRIMARY KEY,
             title LONGTEXT NOT NULL,
             author VARCHAR(255),
@@ -23,9 +23,9 @@ class connection_mysql:
             content LONGTEXT
             )
             '''
-        self.query_2 = "INSERT INTO main_news_mirror_test(id, title, author, date, page, content) VALUES(%s,%s,%s,%s,%s,%s)"
-        self.query_3 = "DELETE FROM main_news_mirror_test WHERE id=%s"
-        self.query_4 = "SELECT COUNT(*) FROM main_news_mirror_test"
+        self.query_2 = "INSERT INTO main_news_mirror_fix(id, title, author, date, page, content) VALUES(%s,%s,%s,%s,%s,%s)"
+        self.query_3 = "DELETE FROM main_news_mirror_fix WHERE id=%s"
+        self.query_4 = "SELECT COUNT(*) FROM main_news_mirror_fix"
 
 
 # class connection_sqlite:
@@ -99,18 +99,16 @@ def update(id, con_instance, author):
     conn.commit()
 
 
-def get(id, connection, dr):
-    con_instance = connection()
+def get(id, con_instance, dr):
     conn = con_instance.conn
     curs = conn.cursor()
 
-    query = "SELECT title FROM {0} WHERE id == {1}".format(dr, str(id))
+    query = "SELECT title FROM {0} WHERE id='{1}';".format(dr, str(id))
+    # print(query)
 
     curs.execute(query)
     conn.commit()
 
     result = curs.fetchone()
-
-    conn.close()
 
     return result
