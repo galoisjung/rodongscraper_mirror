@@ -50,19 +50,12 @@ class Scraper:
                 news_inst = news.news()
                 news_chunk = self.news_queue.get(timeout=3)
                 news_inst.title = news_chunk.select("a")[0].text
-                content = news_chunk.select("p .d-none d-sm-none d-md-block").text
-                if len(news_inst.content.strip()) != 0:
-                    hash_seed = news_inst.title + news_inst.content.splitlines()[0] + news_inst.date
-                else:
-                    hash_seed = news_inst.title
-                news_inst.id = hashlib.sha256(hash_seed.encode('utf-8')).hexdigest()
+                full_content_url = news_chunk.select("a")[0]['href']
+                self.site_scraper(news_chunk, news_inst)
+                print("Scraping URL {}".format(full_content_url))
 
-                if news_inst.id not in self.scraped_ids:
-                    full_content_url = news_chunk.select("a")[0]['href']
-                    self.site_scraper(news_chunk, news_inst)
-                    print("Scraping URL {}".format(full_content_url))
-                    self.scraped_ids.add(news_inst.id)
-
+                if full_content_url not in self.scraped_ids:
+                    self.scraped_ids.add(full_content_url)
                     job = self.pool.submit(self.content_crop, news_inst, full_content_url)
                     job.add_done_callback(self.post_scrape_callback)
 
@@ -83,6 +76,11 @@ class Scraper:
 
     def post_scrape_callback(self, news_inst):
         news_inst = news_inst.result()
+        if len(news_inst.content.strip()) != 0:
+            hash_seed = news_inst.title + news_inst.content.splitlines()[0] + news_inst.date
+        else:
+            hash_seed = news_inst.title
+        news_inst.id = hashlib.sha256(hash_seed.encode('utf-8')).hexdigest()
         self.temp_result.append(news_inst)
 
     def content_crop(self, news_inst, url):

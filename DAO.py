@@ -5,13 +5,13 @@ import sqlite3
 import scraping
 import cryptography
 
-with open('conf_DB.json') as f:
+with open('/content/rodongscraper_mirror/conf_DB.json') as f:
     config = json.load(f)
 
 
 class connection_mysql:
     def __init__(self):
-        self.conn = pymysql.connect(host='localhost', user=config["SQL_ID"], passwd=config["SQL_PASSWORD"],
+        self.conn = pymysql.connect(host='121.142.73.96', user=config["SQL_ID"], passwd=config["SQL_PASSWORD"],
                                     db=config["DB"])
         self.query_1 = '''
             CREATE TABLE IF NOT EXISTS main_news_mirror_fix(
@@ -28,39 +28,24 @@ class connection_mysql:
         self.query_4 = "SELECT COUNT(*) FROM main_news_mirror_fix"
 
 
-# class connection_sqlite:
-#     def __init__(self, drink=False):
-#         self.conn = sqlite3.connect("youtube.db")
-#
-#         if not drink:
-#             self.query_1 = '''
-#             CREATE TABLE IF NOT EXISTS nondrink(
-#             id INT PRIMARY KEY,
-#             title LONGTEXT NOT NULL,
-#             author VARCHAR(255) NOT NULL,
-#             `date` VARCHAR(255) NOT NULL,
-#             `length` int NOT NULL,
-#             resolution VARCHAR(225) NOT NULL,
-#             keyword LONGTEXT)
-#             '''
-#             self.query_2 = "INSERT INTO nondrink(id, title, author, date, length, resolution,keyword)  VALUES(?,?,?,?,?,?,?)"
-#             self.query_3 = "DELETE FROM nondrink WHERE id=?"
-#             self.query_4 = "SELECT COUNT(*) FROM nondrink "
-#         else:
-#             self.query_1 = '''
-#                 CREATE TABLE IF NOT EXISTS drink(
-#                 id INT PRIMARY KEY,
-#                 title LONGTEXT NOT NULL,
-#                 author VARCHAR(255) NOT NULL,
-#                 `date` VARCHAR(255) NOT NULL,
-#                 resolution VARCHAR(225) NOT NULL,
-#                 `length` int NOT NULL,
-#                 keyword LONGTEXT)
-#                 '''
-#             self.query_2 = "INSERT INTO drink(id, title, author, date, length, resolution, keyword) VALUES(?,?,?,?,?,?,?)"
-#             self.query_3 = "DELETE FROM drink WHERE id=?"
-#             self.query_4 = "SELECT COUNT(*) FROM drink "
-#
+class connection_sqlite:
+    def __init__(self):
+        self.conn = sqlite3.connect("/content/drive/MyDrive/main_news.db")
+
+        self.query_1 = '''
+               CREATE TABLE IF NOT EXISTS main_news_mirror_fix(
+               id VARCHAR(255) PRIMARY KEY,
+               title LONGTEXT NOT NULL,
+               author VARCHAR(255),
+               `date` DATE NOT NULL,
+               page INT,
+               content LONGTEXT
+               )
+               '''
+        self.query_2 = "INSERT INTO main_news_mirror_fix(id, title, author, date, page, content) VALUES(?,?,?,?,?,?)"
+        self.query_3 = "DELETE FROM main_news_mirror_fix WHERE id=?"
+        self.query_4 = "SELECT COUNT(*) FROM main_news_mirror_fix"
+
 
 def add(news, con_instance):
     conn = con_instance.conn
