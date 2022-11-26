@@ -14,5 +14,5 @@ for i in range(1000):
 
     for j in news_list:
         if DAO.get(j.id,mysql_instance,"main_news_mirror_fix") == None:
-            DAO.add(j, mysql_instance)
+            print(j.id, j.date)
 
