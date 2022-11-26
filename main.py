@@ -13,5 +13,6 @@ for i in range(1000):
     news_list = scraping_inst.temp_result
 
     for j in news_list:
-        DAO.add(j, mysql_instance)
+        if DAO.get(j.id,mysql_instance,"main_news_mirror_fix") == None:
+            DAO.add(j, mysql_instance)
 

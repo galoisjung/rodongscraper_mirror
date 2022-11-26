@@ -51,8 +51,11 @@ class Scraper:
                 news_chunk = self.news_queue.get(timeout=3)
                 news_inst.title = news_chunk.select("a")[0].text
                 content = news_chunk.select("p .d-none d-sm-none d-md-block").text
-                id_raw = news_inst.title + content.split()[0]
-                news_inst.id = hashlib.sha256(id_raw.encode('utf-8')).hexdigest()
+                if len(news_inst.content.strip()) != 0:
+                    hash_seed = news_inst.title + news_inst.content.splitlines()[0] + news_inst.date
+                else:
+                    hash_seed = news_inst.title
+                news_inst.id = hashlib.sha256(hash_seed.encode('utf-8')).hexdigest()
 
                 if news_inst.id not in self.scraped_ids:
                     full_content_url = news_chunk.select("a")[0]['href']
