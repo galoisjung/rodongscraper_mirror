@@ -79,7 +79,7 @@ class Scraper:
         if len(news_inst.content.strip()) != 0:
             hash_seed = news_inst.title + news_inst.content.splitlines()[0] + news_inst.date
         else:
-            hash_seed = news_inst.title
+            hash_seed = news_inst.title + news_inst.date
         news_inst.id = hashlib.sha256(hash_seed.encode('utf-8')).hexdigest()
         self.temp_result.append(news_inst)
 
